@@ -1,28 +1,85 @@
-import Layout from "@/layouts";
+import dynamic from "next/dynamic";
+import {
+  Box,
+  Flex,
+  Grid,
+  GridItem,
+  Card,
+  CardBody,
+  CardHeader,
+  CardFooter,
+  Heading,
+  Text,
+  Button,
+} from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
-export default function posts({ posts }) {
-  console.log("Posts : ", posts);
+const LayoutComponent = dynamic(() => import("@/layouts"));
+
+export default function posts() {
+  const router = useRouter();
+  const [posts, setPosts] = useState();
+
+  useEffect(() => {
+    async function fetchingData() {
+      const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+      const listPosts = await res.json();
+      setPosts(listPosts);
+    }
+    fetchingData();
+  }, []);
+
+  console.log("Posts =>", posts);
+
   return (
     <>
-      <Layout
-        metaTitle={"Posts"}
-        metaDescription={"Informasi posts dari Next App"}
-      >
-        <div className="h-full m-4 ">
-          {posts.posts.map((item) => (
-            <div className="flex gap-2 mb-2 border-b-2">
-              <p className="font-bold">{item.title}.</p>
-              <p>{item.body}</p>
-            </div>
-          ))}
-        </div>
-      </Layout>
+      <LayoutComponent metaTitle={"Posts"}>
+        <Box padding="5">
+          <Flex justifyContent="end">
+            <Button
+              colorScheme="blue"
+              onClick={() => router.push("/posts/add")}
+            >
+              Add Posts
+            </Button>
+          </Flex>
+          <Flex>
+            <Grid templateColumns="repeat(3, 1fr)" gap={5}>
+              {posts?.map((item) => (
+                <GridItem>
+                  <Card>
+                    <CardHeader>
+                      <Heading>{item?.title}</Heading>
+                    </CardHeader>
+                    <CardBody>
+                      <Text>{item?.body}</Text>
+                    </CardBody>
+                    <CardFooter justify="space-between" flexWrap="wrap">
+                      <Button
+                        onClick={() => router.push(`/posts/edit/${item?.id}`)}
+                        flex="1"
+                        variant="ghost"
+                      >
+                        Edit
+                      </Button>
+                      <Button flex="1" colorScheme="red">
+                        Delete
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </GridItem>
+              ))}
+            </Grid>
+          </Flex>
+        </Box>
+      </LayoutComponent>
     </>
   );
 }
 
-export async function getServerSideProps() {
-  const res = await fetch("https://dummyjson.com/posts");
-  const posts = await res.json();
-  return { props: { posts } };
-}
+// export async function getServerSideProps() {
+//   const res = await fetch("https://dummyjson.com/posts");
+//   const posts = await res.json();
+//   return { props: { posts } };
+// }
