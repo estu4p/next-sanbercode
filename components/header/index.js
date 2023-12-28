@@ -18,8 +18,8 @@ export default function Header() {
           <Link href="/users" className="cursor-pointer hover:text-white">
             Users
           </Link>
-          <Link href="/posts" className="cursor-pointer hover:text-white">
-            Posts
+          <Link href="/notes" className="cursor-pointer hover:text-white">
+            Notes
           </Link>
         </div>
       </section>

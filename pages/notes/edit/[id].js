@@ -10,54 +10,68 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const LayoutComponent = dynamic(() => import("@/layouts"));
 
-export default function AddPosts() {
+export default function UpdateNotes() {
   const router = useRouter();
-  const [posts, setPosts] = useState({
+  const { id } = router.query;
+  const [notes, setNotes] = useState({
     title: "",
-    body: "",
+    description: "",
   });
 
   const HandleSubmit = async () => {
     try {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/posts",
-        {
-          method: "POST",
-          body: JSON.stringify(posts),
-        }
-      );
+      const response = await fetch("http://localhost:3000/api/notes/add", {
+        method: "POST",
+        body: JSON.stringify(notes),
+      });
       const result = await response.json();
       if (result?.success) {
-        router.push("/posts");
+        router.push("/notes");
       }
-      console.log("error");
     } catch (error) {}
   };
 
+  useEffect(() => {
+    async function fetchingData(notesId) {
+      try {
+        const res = await fetch(`http://localhost:3000/api/notes/${notesId}`);
+        const notes = await res.json();
+        setNotes({
+          ...notes,
+          title: notes?.data?.title,
+          description: notes?.data?.description,
+        });
+      } catch (error) {}
+    }
+    if (id) fetchingData(id);
+  }, [id]);
+
   return (
     <>
-      <LayoutComponent metaTitle="Posts">
+      <LayoutComponent metaTitle="Notes">
         <Card margin="5" padding="5">
-          <Heading>Add Posts</Heading>
+          <Heading>Add Notes</Heading>
           <Grid gap="5">
             <GridItem>
               <Text>Title</Text>
               <Input
+                value={notes?.title}
                 type="text"
                 onChange={(event) =>
-                  setPosts({ ...posts, title: event.target.value })
+                  setNotes({ ...notes, title: event.target.value })
                 }
               />
             </GridItem>
             <GridItem>
               <Text>Body</Text>
               <Textarea
+                value={notes?.description}
                 onChange={(event) =>
-                  setPosts({ ...posts, body: event.target.value })
+                  setNotes({ ...notes, description: event.target.value })
                 }
               />
             </GridItem>

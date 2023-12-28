@@ -17,53 +17,72 @@ import { useRouter } from "next/router";
 
 const LayoutComponent = dynamic(() => import("@/layouts"));
 
-export default function posts() {
+export default function Notes() {
   const router = useRouter();
-  const [posts, setPosts] = useState();
+  const [notes, setNotes] = useState();
 
   useEffect(() => {
     async function fetchingData() {
-      const res = await fetch("https://jsonplaceholder.typicode.com/posts");
-      const listPosts = await res.json();
-      setPosts(listPosts);
+      try {
+        const res = await fetch("http://localhost:3000/api/notes");
+        const listNotes = await res.json();
+        setNotes(listNotes);
+      } catch (error) {}
     }
     fetchingData();
   }, []);
 
-  console.log("Posts =>", posts);
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/notes/delete/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const result = await response.json();
+      if (result?.success) {
+        router.reload();
+      }
+    } catch (error) {}
+  };
 
   return (
     <>
-      <LayoutComponent metaTitle={"Posts"}>
+      <LayoutComponent metaTitle={"Notes"}>
         <Box padding="5">
           <Flex justifyContent="end">
             <Button
               colorScheme="blue"
-              onClick={() => router.push("/posts/add")}
+              onClick={() => router.push("/notes/add")}
             >
-              Add Posts
+              Add Notes
             </Button>
           </Flex>
-          <Flex>
+          <Flex justify={"center"}>
             <Grid templateColumns="repeat(3, 1fr)" gap={5}>
-              {posts?.map((item) => (
+              {notes?.data.map((item) => (
                 <GridItem>
                   <Card>
                     <CardHeader>
                       <Heading>{item?.title}</Heading>
                     </CardHeader>
                     <CardBody>
-                      <Text>{item?.body}</Text>
+                      <Text>{item?.description}</Text>
                     </CardBody>
                     <CardFooter justify="space-between" flexWrap="wrap">
                       <Button
-                        onClick={() => router.push(`/posts/edit/${item?.id}`)}
+                        onClick={() => router.push(`/notes/edit/${item?.id}`)}
                         flex="1"
                         variant="ghost"
                       >
                         Edit
                       </Button>
-                      <Button flex="1" colorScheme="red">
+                      <Button
+                        onClick={() => handleDelete(item?.id)}
+                        flex="1"
+                        colorScheme="red"
+                      >
                         Delete
                       </Button>
                     </CardFooter>
