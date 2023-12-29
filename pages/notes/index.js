@@ -15,14 +15,21 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useQueries } from "@/hooks/useQueries";
+import fetcher from "@/utils/fetcher";
+import useSWR from "swr";
 
 const LayoutComponent = dynamic(() => import("@/layouts"));
 
 export default function Notes() {
-  const { data, isLoading } = useQueries({
-    prefixUrl: "http://localhost:3000/api/notes",
-  });
-  const router = useRouter();
+  // const { data, isLoading } = useQueries({
+  //   prefixUrl: "http://localhost:3000/api/notes",
+  // });
+  // const router = useRouter();
+
+  const { data, isLoading } = useSWR(
+    "http://localhost:3000/api/notes",
+    fetcher
+  );
 
   const handleDelete = async (id) => {
     try {
