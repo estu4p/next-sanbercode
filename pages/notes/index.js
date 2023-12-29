@@ -11,26 +11,18 @@ import {
   Heading,
   Text,
   Button,
+  Spinner,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useQueries } from "@/hooks/useQueries";
 
 const LayoutComponent = dynamic(() => import("@/layouts"));
 
 export default function Notes() {
+  const { data, isLoading } = useQueries({
+    prefixUrl: "http://localhost:3000/api/notes",
+  });
   const router = useRouter();
-  const [notes, setNotes] = useState();
-
-  useEffect(() => {
-    async function fetchingData() {
-      try {
-        const res = await fetch("http://localhost:3000/api/notes");
-        const listNotes = await res.json();
-        setNotes(listNotes);
-      } catch (error) {}
-    }
-    fetchingData();
-  }, []);
 
   const handleDelete = async (id) => {
     try {
@@ -51,7 +43,7 @@ export default function Notes() {
     <>
       <LayoutComponent metaTitle={"Notes"}>
         <Box padding="5">
-          <Flex justifyContent="end">
+          <Flex justifyContent="end" alignItems={"start"}>
             <Button
               colorScheme="blue"
               onClick={() => router.push("/notes/add")}
@@ -59,38 +51,50 @@ export default function Notes() {
               Add Notes
             </Button>
           </Flex>
-          <Flex justify={"center"}>
-            <Grid templateColumns="repeat(3, 1fr)" gap={5}>
-              {notes?.data.map((item) => (
-                <GridItem>
-                  <Card>
-                    <CardHeader>
-                      <Heading>{item?.title}</Heading>
-                    </CardHeader>
-                    <CardBody>
-                      <Text>{item?.description}</Text>
-                    </CardBody>
-                    <CardFooter justify="space-between" flexWrap="wrap">
-                      <Button
-                        onClick={() => router.push(`/notes/edit/${item?.id}`)}
-                        flex="1"
-                        variant="ghost"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={() => handleDelete(item?.id)}
-                        flex="1"
-                        colorScheme="red"
-                      >
-                        Delete
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </GridItem>
-              ))}
-            </Grid>
-          </Flex>
+          {isLoading ? (
+            <Flex justify="center" alignItems="center">
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="blue.500"
+                size="xl"
+              />
+            </Flex>
+          ) : (
+            <Flex justify={"center"}>
+              <Grid templateColumns="repeat(3, 1fr)" gap={5}>
+                {data?.data.map((item) => (
+                  <GridItem key={item?.id}>
+                    <Card>
+                      <CardHeader>
+                        <Heading>{item?.title}</Heading>
+                      </CardHeader>
+                      <CardBody>
+                        <Text>{item?.description}</Text>
+                      </CardBody>
+                      <CardFooter justify="space-between" flexWrap="wrap">
+                        <Button
+                          onClick={() => router.push(`/notes/edit/${item?.id}`)}
+                          flex="1"
+                          variant="ghost"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(item?.id)}
+                          flex="1"
+                          colorScheme="red"
+                        >
+                          Delete
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </GridItem>
+                ))}
+              </Grid>
+            </Flex>
+          )}
         </Box>
       </LayoutComponent>
     </>

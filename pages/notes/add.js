@@ -8,13 +8,16 @@ import {
   Button,
   Input,
   Textarea,
+  Spinner,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useMutation } from "@/hooks/useMutation";
 
 const LayoutComponent = dynamic(() => import("@/layouts"));
 
 export default function AddNotes() {
+  const { mutate, isLoading } = useMutation();
   const router = useRouter();
   const [notes, setNotes] = useState({
     title: "",
@@ -22,16 +25,14 @@ export default function AddNotes() {
   });
 
   const HandleSubmit = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/notes/add", {
-        method: "POST",
-        body: JSON.stringify(notes),
-      });
-      const result = await response.json();
-      if (result?.success) {
-        router.push("/notes");
-      }
-    } catch (error) {}
+    const response = await mutate({
+      url: "http://localhost:3000/api/notes/add",
+      payload: JSON.stringify(notes),
+    });
+    console.log("response : ", response);
+    if (response?.success) {
+      router.push("/notes");
+    }
   };
 
   return (

@@ -7,6 +7,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
       },
     });
+    console.log("req body : ", req.body);
     const data = await response.json();
     res.status(200).json(data);
   } catch (error) {

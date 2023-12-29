@@ -15,7 +15,7 @@ export default function Layout({ children, metaTitle, metaDescription }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      {children}
+      <div style={{ minHeight: "80vh" }}>{children}</div>
       <Footer />
     </>
   );
