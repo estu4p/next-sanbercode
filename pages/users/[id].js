@@ -2,7 +2,6 @@ import Layout from "@/layouts";
 import Link from "next/link";
 
 export default function DetailUsers({ users }) {
-  console.log("users : ", users);
   return (
     <>
       <Layout

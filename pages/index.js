@@ -6,12 +6,12 @@ import dynamic from "next/dynamic";
 const LayoutComponent = dynamic(() => import("@/layouts"));
 
 export default function Main() {
-  useEffect(() => {
-    fetch("api/hello")
-      .then((res) => res.json())
-      .then((res) => console.log("response => ", res))
-      .catch((err) => console.log("response => ", err));
-  }, []);
+  // useEffect(() => {
+  //   fetch("api/hello")
+  //     .then((res) => res.json())
+  //     .then((res) => console.log("response => ", res))
+  //     .catch((err) => console.log("response => ", err));
+  // }, []);
 
   return (
     <>
